@@ -1,11 +1,10 @@
 param(
   [string]$PublishDirectory = (Join-Path $PSScriptRoot '..\..\desktop\publish-tokenrouter'),
-  [string]$OutputDirectory = (Join-Path $PSScriptRoot '..\..\output\release\v0.1.0'),
+  [string]$OutputDirectory,
   [string]$Version
 )
 $ErrorActionPreference = 'Stop'
 $PublishDirectory = [IO.Path]::GetFullPath($PublishDirectory)
-$OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
 $fileVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $PublishDirectory 'Mori.Desktop.exe')).FileVersion
 if (-not $Version) {
   $parts = @($fileVersion.Split('.'))
@@ -14,6 +13,8 @@ if (-not $Version) {
 }
 if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "Version must have the form major.minor.patch; got '$Version'." }
 $version = $Version
+if (-not $OutputDirectory) { $OutputDirectory = Join-Path (Join-Path $PSScriptRoot '..\..\output\release') "v$version" }
+$OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
 $installerName = "Mori-Setup-v$version-win-x64.exe"
 $payloadName = "Mori-$version-win-x64.zip"
 $iexpress = Join-Path $env:WINDIR 'System32\iexpress.exe'
@@ -75,7 +76,7 @@ SourceFiles0=$work
 %FILE2%=
 %FILE3%=
 "@
-$sedPath = Join-Path $work 'MoriV01.sed'
+$sedPath = Join-Path $work 'MoriSetup.sed'
 Set-Content -LiteralPath $sedPath -Value $sed -Encoding Default
 $null = Start-Process -FilePath $iexpress -ArgumentList @('/N', '/Q', $sedPath) -PassThru
 $deadline = [DateTime]::UtcNow.AddMinutes(8)

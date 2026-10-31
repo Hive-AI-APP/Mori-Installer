@@ -2,10 +2,10 @@
 
 Windows x64 release assets and packaging sources for Mori.
 
-## V0.1
+## V0.1.1 — latest
 
 - Platform: Windows x64
-- Package: `Mori-Setup-v0.1.0-win-x64.exe`
+- Package: `Mori-Setup-v0.1.1-win-x64.exe`
 - Installer type: per-user setup; no administrator prompt is required
 - Includes the self-contained Mori desktop app, Node.js runtime, and bundled Mozaik worker
 - Creates a Start menu shortcut and a Windows uninstall entry
@@ -15,7 +15,7 @@ Windows x64 release assets and packaging sources for Mori.
 - Unsigned: Windows may show an unknown publisher or SmartScreen warning
 - macOS and Linux installers are not included
 
-Download the installer from the [V0.1 release](https://github.com/Hive-AI-APP/Mori-Installer/releases/tag/v0.1). The repository and release must be public for the app's unauthenticated update check to work. Verify the installer using its accompanying `.sha256` file.
+Download the installer from the [V0.1.1 release](https://github.com/Hive-AI-APP/Mori-Installer/releases/tag/v0.1.1). The repository and release must be public for the app's unauthenticated update check to work. Verify the installer using its accompanying `.sha256` file.
 
 ## Build the Windows installer
 
@@ -27,7 +27,7 @@ Build Mori's self-contained Windows publish output from the Mori source checkout
 
 The Windows IExpress build produces `Mori-Setup-v<version>-win-x64.exe` and its SHA-256 sidecar. Exclude PDB debug symbols. Keep provider credentials and private signing keys out of the publish directory.
 
-For a future release, bump the app version in the Mori project, build the desktop app, create a release tag such as `v0.1.1`, and attach both the matching installer and `.sha256` asset to the GitHub release. The app will offer that newer version under Settings → Mori updates.
+For a future release, bump the app version in the Mori project, build the desktop app, create a numeric release tag such as `v0.1.2`, and attach both the matching installer and `.sha256` asset to the GitHub release. The app will offer that newer version under Settings → Mori updates.
 
 ## Install / uninstall
 
