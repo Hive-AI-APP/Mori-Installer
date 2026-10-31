@@ -1,0 +1,7 @@
+Mori V0.1 includes the Node.js runtime for the Mozaik worker.
+Node.js is licensed under the MIT License. The full license is included as NODE-LICENSE.txt.
+
+Mori is published as a self-contained .NET Windows application. Microsoft .NET distribution terms are available at:
+https://dotnet.microsoft.com/en-us/dotnet/core
+
+No NVIDIA NIM API key is included in this installer.
