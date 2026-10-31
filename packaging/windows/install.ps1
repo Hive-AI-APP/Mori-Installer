@@ -5,8 +5,11 @@ param(
   [switch]$SkipLaunch
 )
 $ErrorActionPreference = 'Stop'
-$package = Join-Path $PSScriptRoot 'Mori-0.1.0-win-x64.zip'
-if (-not (Test-Path -LiteralPath $package)) { throw 'The Mori V0.1 package is missing.' }
+$packages = @(Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'Mori-*-win-x64.zip' -File)
+if ($packages.Count -ne 1) { throw 'The Mori package is missing or ambiguous.' }
+$package = $packages[0].FullName
+if ($packages[0].BaseName -notmatch '^Mori-(\d+\.\d+\.\d+)-win-x64$') { throw 'The Mori package version is invalid.' }
+$version = $Matches[1]
 if (Get-Process -Name 'Mori.Desktop' -ErrorAction SilentlyContinue) {
   throw 'Close Mori before installing or updating it, then run this installer again.'
 }
@@ -46,7 +49,7 @@ try {
     New-Item -Path $key -Force | Out-Null
     $uninstaller = Join-Path $resolved 'uninstall.ps1'
     Set-ItemProperty $key DisplayName 'Mori'
-    Set-ItemProperty $key DisplayVersion '0.1.0'
+    Set-ItemProperty $key DisplayVersion $version
     Set-ItemProperty $key Publisher 'Mori'
     Set-ItemProperty $key InstallLocation $resolved
     Set-ItemProperty $key UninstallString ('powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' + $uninstaller + '"')
@@ -54,7 +57,7 @@ try {
     Set-ItemProperty $key NoRepair 1 -Type DWord
   }
 
-  Write-Host 'Mori V0.1 is installed. Find Mori in the Start menu.'
+  Write-Host "Mori $version is installed. Find Mori in the Start menu."
   if (-not $SkipLaunch) { Start-Process -FilePath (Join-Path $resolved 'Mori.Desktop.exe') -WorkingDirectory $resolved }
 }
 finally {

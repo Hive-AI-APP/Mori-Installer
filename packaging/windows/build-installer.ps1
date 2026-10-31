@@ -1,13 +1,21 @@
 param(
   [string]$PublishDirectory = (Join-Path $PSScriptRoot '..\..\desktop\publish-tokenrouter'),
-  [string]$OutputDirectory = (Join-Path $PSScriptRoot '..\..\output\release\v0.1.0')
+  [string]$OutputDirectory = (Join-Path $PSScriptRoot '..\..\output\release\v0.1.0'),
+  [string]$Version
 )
 $ErrorActionPreference = 'Stop'
 $PublishDirectory = [IO.Path]::GetFullPath($PublishDirectory)
 $OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
-$version = '0.1.0'
-$installerName = 'Mori-Setup-v0.1.0-win-x64.exe'
-$payloadName = 'Mori-0.1.0-win-x64.zip'
+$fileVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $PublishDirectory 'Mori.Desktop.exe')).FileVersion
+if (-not $Version) {
+  $parts = @($fileVersion.Split('.'))
+  if ($parts.Count -lt 3) { throw "Could not read a three-part app version from '$fileVersion'." }
+  $Version = ($parts | Select-Object -First 3) -join '.'
+}
+if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "Version must have the form major.minor.patch; got '$Version'." }
+$version = $Version
+$installerName = "Mori-Setup-v$version-win-x64.exe"
+$payloadName = "Mori-$version-win-x64.zip"
 $iexpress = Join-Path $env:WINDIR 'System32\iexpress.exe'
 if (-not (Test-Path (Join-Path $PublishDirectory 'Mori.Desktop.exe'))) { throw 'Build the self-contained Windows app first.' }
 if (-not (Test-Path (Join-Path $PublishDirectory 'node.exe')) -or -not (Test-Path (Join-Path $PublishDirectory 'mozaik-runtime\index.cjs'))) { throw 'The Node runtime or bundled Mozaik worker is missing.' }
@@ -30,7 +38,7 @@ Copy-Item (Join-Path $PSScriptRoot 'setup.cmd') $work
 
 $target = Join-Path $OutputDirectory $installerName
 $null = Remove-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue
-$null = Remove-Item -LiteralPath (Join-Path $OutputDirectory "~Mori-Setup-v0.1.0-win-x64.CAB") -Force -ErrorAction SilentlyContinue
+$null = Remove-Item -LiteralPath (Join-Path $OutputDirectory "~Mori-Setup-v$version-win-x64.CAB") -Force -ErrorAction SilentlyContinue
 $sed = @"
 [Version]
 Class=IEXPRESS
@@ -46,9 +54,9 @@ CAB_ResvCodeSigning=0
 RebootMode=N
 InstallPrompt=
 DisplayLicense=
-FinishMessage=Mori V0.1 is installed. Find Mori in the Start menu.
+FinishMessage=Mori $version is installed. Find Mori in the Start menu.
 TargetName=$target
-FriendlyName=Mori V0.1 Setup
+FriendlyName=Mori $version Setup
 AppLaunched=setup.cmd
 PostInstallCmd=<None>
 AdminQuietInstCmd=<None>
